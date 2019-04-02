@@ -18,7 +18,7 @@ while test:
     print('creating ...' + name)
     cv2.imwrite(name, frame)
     count +=1
-    if count == 15:
+    if count == 2:
         test = False
 cap.release()
 
@@ -138,8 +138,75 @@ right_points = get_obj_point(right_data_folder, right_calibration_folder)
 #%%
 print (right_points)
 #%%
+right_points_real = [[(0,0),(0,9),(12.5,7.5),(25,15),(25,10.5),(25,4.5)]]
+
+
+
+#%%
+
+#conversion des coordonnées tuples en np.array
+lis1 = []
+lis2 = []
+
+for i in right_points:
+	for j in i:
+		print(j)
+		list(j)
+		lis1.append(list(j))
+
+for i in right_points_real:
+	for j in i:
+		print(j)
+		list(j)
+		lis2.append(list(j))
+
+lis1 = np.array(lis1, dtype='float')
+lis2 = np.array(lis2, dtype = 'float')
+#%%
+
+#test sur la premiere image 
+
+print(lis1)
+right_points_image = lis1[:6]
+right_points_object = lis2
+
+
+#%%
+
+#ajout de la 3ieme dimension pour l'objet
+v = np.ones ((right_points_object.shape[0], 1))
+right_points_object = np.hstack((right_points_object,v))
+
+#%%
+#stockage dans une liste et ! float32
+right_points_object = right_points_object.reshape(1, -1, 3)
+right_points_image = right_points_image.reshape(1, -1, 2)
+print (right_points_object)
+print(right_points_image)
+right_points_object = right_points_object.astype('float32')
+right_points_image = right_points_image.astype('float32')
+
+#%%
+#Calcul de la matrice de la camera fictive
+camera_matrix = cv2.initCameraMatrix2D([right_points_object], [right_points_image], img_right.shape[:2]) 
+#%%
+#calcul sur le jeu de donnees reel
+
+ret, mtx, dist, rvecs, tvecs, = cv2.calibrateCamera([right_points_object], [right_points_image], img_right.shape[:2], camera_matrix, None, flags=cv2.CALIB_USE_INTRINSIC_GUESS)
+
+
+#%%
+print(mtx)
+
+
+
+#%%
 print (right_points)
 #%%
+#%%
+
+
+
 left_points = get_obj_point(left_data_folder, left_calibration_folder)
 #%%
 print (left_points)
