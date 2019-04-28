@@ -8,7 +8,7 @@ import os
 
 #%%
 # saving right camera pictures
-cap = cv2.VideoCapture('C:/Users/cleme/Documents/Projet/Untitled Folder/Video/Angle1.mp4')
+cap = cv2.VideoCapture('./Video/Angle1.mp4')
 count = 0
 test = True
 while test:
