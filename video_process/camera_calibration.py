@@ -164,6 +164,7 @@ lis1 = np.array(lis1, dtype='float')
 lis2 = np.array(lis2, dtype = 'float')
 #%%
 
+
 #test sur la premiere image 
 
 print(lis1)
