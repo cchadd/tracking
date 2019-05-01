@@ -4,7 +4,6 @@
     Calibration and projection matrix
 """
 
-
 #%% Imports
 import cv2
 import numpy as np
@@ -50,7 +49,7 @@ def click_and_crop(event, x, y, flags, param):
         cv2.rectangle(im, refPt[0], refPt[1], (0, 0, 255), 2)
         cv2.imshow("image", im)
 
-def get_obj_point(path, num_frame):
+def get_obj_point(path, num_frame, angle):
     '''
     Returns coordinates of selected points
     Inputs:
@@ -61,14 +60,22 @@ def get_obj_point(path, num_frame):
         number of frames used to perform calibration
     '''
     assert isinstance(path, str)
+    assert isinstance(angle, str)
     assert isinstance(num_frame, int)
 
     global crd, im
     coord = []
     count = 0
 
-    #selecting num_frame in folder
-    frames = os.listdir(path)[:num_frame]
+    # Frames selection
+    regex = 'Angle{}_frame_{}.jpg'
+
+    if angle == 'right':
+        angle_index = 1
+    else:
+        angle_index = 2
+    frames = [regex.format(angle_index, i+1) for i in range(num_frame)]
+
 
     for frame in frames:
         img_right = cv2.imread(path + frame)
@@ -136,9 +143,11 @@ plt.show()
 
 #%%
 
-path_to_frames = './frames/angle1/'
-num_frame = 5
-right_points = get_obj_point(path_to_frames, num_frame)
+path_to_frames = './frames/'
+num_frame = 1
+angle = 'right'
+
+right_points = get_obj_point(path_to_frames, num_frame, angle)
 
 
 #%%
@@ -152,39 +161,9 @@ for frame_num in range (0, len(right_points)):
 #%%
 
 # Store the coordinates in a matrix
-np.save('image_points', image_points)
+# np.save('image_points', image_points)
 
-image_points = np.load('image_points.npy')
-
-#%%Compute mean point coordinate
-right_points_mean = []
-
-for coord_num in range (0, len(right_points[0])):
-    mean = [0, 0]
-    for frame_num in range (0, len(right_points)):
-        mean[0] += right_points[frame_num][coord_num][0]
-        mean[1] += right_points[frame_num][coord_num][1]
-    mean[0] = mean[0]/len(right_points)
-    mean[1] = mean[1]/len(right_points)
-    right_points_mean.append(mean)
-
-image_points_mean = np.array(right_points_mean)
-
-
-#%%Display mean chosen points
-interest_points_vec_mean = []
-for point in right_points_mean:
-    interest_points_vec_mean.append(point)
-interest_points_vec_mean = np.array(interest_points_vec_mean)
-
-plt.figure(figsize=(15, 5))
-plt.imshow(im, cmap='jet')
-plt.scatter(interest_points_vec_mean[:, 0], interest_points_vec_mean[:, 1], s=60,
-            alpha=0.5, edgecolor='k', color='w')
-for i, point in enumerate(interest_points_vec_mean):
-    plt.annotate(str(i), tuple(point))
-plt.show()
-
+# image_points = np.load('image_points.npy')
 
 #%% Display the chosen points
 interest_points_vec = []
@@ -206,18 +185,11 @@ keys = [i for i in sorted(list(soccer_keypoint.keys())) if i>=0]
 for key in keys:
     object_points.append(list(soccer_keypoint[key]))
 object_points = np.array(object_points)
-#%%Same as below but with mean values
-
-try:
-    assert image_points_mean.shape == object_points.shape
-    print('Success ! Same number of image and object points...')
-except:
-    print('Dimension of image and object points not matching.')
-    print(image_points.shape, object_points.shape)
-
-
 
 #%%
+
+image_points = image_points[0]
+
 try:
     assert image_points.shape == object_points.shape
     print('Success ! Same number of image and object points...')
@@ -225,24 +197,7 @@ except:
     print('Dimension of image and object points not matching.')
     print(image_points.shape, object_points.shape)
 
-#%% Calibration with mean values
-object_p_vec = object_points.copy()
-image_p_vec_mean = image_points_mean.copy()
-
-key_selection = [2, 5, 12, 13, 6]
-object_p_vec = object_p_vec[key_selection]
-image_p_vec_mean = image_p_vec_mean[key_selection]
-
-n = object_p_vec.shape[0]
-v = np.ones ((n, 1))
-
-image_p_vec_mean = np.hstack((image_p_vec_mean, v))
-image_p_vec_mean = image_p_vec_mean.reshape(1, -1, 3).astype('float32')
-
-object_p_vec = object_p_vec.reshape(1, -1, 2).astype('float32')
 #%%Calibration
-
-
 
 object_p_vec = object_points.copy()
 image_p_vec = image_points.copy()
@@ -259,17 +214,7 @@ image_p_vec = image_p_vec.reshape(1, -1, 3).astype('float32')
 
 object_p_vec = object_p_vec.reshape(1, -1, 2).astype('float32')
 
-#%% Calcul de la matrice d'homotopie with mean values
-
-camera_matrix = cv2.initCameraMatrix2D([image_p_vec_mean], [object_p_vec],
-                                       im.shape[:2])
-
-ret, mtx, dist, rvecs, tvecs, = cv2.calibrateCamera(
-        [image_p_vec_mean], [object_p_vec],
-        im.shape[:2], camera_matrix,
-        None, flags=cv2.CALIB_USE_INTRINSIC_GUESS)
-
-#%%Calcul de la matrice d'homotopie
+#%% Calcul de la matrice d'homotopie
 camera_matrix = cv2.initCameraMatrix2D([image_p_vec], [object_p_vec],
                                        im.shape[:2])
 
@@ -277,15 +222,6 @@ ret, mtx, dist, rvecs, tvecs, = cv2.calibrateCamera(
         [image_p_vec], [object_p_vec],
         im.shape[:2], camera_matrix,
         None, flags=cv2.CALIB_USE_INTRINSIC_GUESS)
-
-
-#%% From object to image
-i = 0 # Since there is only one temporal frame
-projected_points_mean, _ = cv2.projectPoints(image_p_vec_mean[i], rvecs[i], tvecs[i],
-                                        mtx, dist)
-
-error = cv2.norm(projected_points_mean[:, i], object_p_vec[i], cv2.NORM_L2)/len(projected_points_mean)
-print('Reprojection error: {}'.format(round(error, 2)))
 
 #%% From object to image
 
@@ -295,26 +231,6 @@ projected_points, _ = cv2.projectPoints(image_p_vec[i], rvecs[i], tvecs[i],
 
 error = cv2.norm(projected_points[:, i], object_p_vec[i], cv2.NORM_L2)/len(projected_points)
 print('Reprojection error: {}'.format(round(error, 2)))
-
-#%% Evaluate the projection with mean values
-fig = plt.figure(figsize=(10, 10))
-
-plt.scatter(projected_points_mean[:, 0, 0], projected_points_mean[:, 0, 1],
-            edgecolor='k', alpha=0.8, color='r')
-
-plt.scatter(object_p_vec[0, :, 0], object_p_vec[0, :, 1],
-            edgecolor='k', alpha=0.8, color='gray')
-
-for i, key in enumerate(key_selection):
-    a = tuple(projected_points_mean[i][0])
-    b = tuple(object_p_vec[0][i])
-    plt.annotate(str(key), a)
-    plt.annotate(str(key), b)
-    stacked = np.vstack((a, b))
-    plt.plot(stacked[:, 0], stacked[:, 1], 'k--')
-
-plt.show()
-
 
 #%% Evaluate the projection
 
