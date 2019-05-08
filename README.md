@@ -1,13 +1,17 @@
-##
-Terrain de Foot Idéal 2D <-> Plan 3D Real Video Urban
-ideal -> real
-real -> ideal
-projection_ideal_to_real.py
-projection_real_to_ideal.py
+######## PROJET TRACKING ARCHITECTURE ########
 
-
-# experiments:
-- Dossier avec les expériences uniques pour y mettre des blocs fonctionnels comme par exemple la sélection de régions et la détection de lignes.
-
-## detection de lignes
-- Script pour la détection de lignes
+/ PATH EXECUTION
+     / darknet
+     / roi_frames
+     / video
+     / frames
+     / shared
+          .git
+          / calibration
+          / detection_ballon
+          / detection_personnes
+          / player_stats
+          / interface_graphique
+          / experiments
+          / recherche_articles
+          / AR
