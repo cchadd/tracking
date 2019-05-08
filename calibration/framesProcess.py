@@ -23,7 +23,7 @@ class FramesProcess(object):
     def __init__(self):
         pass
     
-    def get_frames(path_to_video, path_to_store, name_to_frames, \
+    def get_frames(self, path_to_video, path_to_store, name_to_frames, \
                    frame_delay=10, frame_count=5):
         '''
         Inputs:
@@ -52,13 +52,12 @@ class FramesProcess(object):
 
         capture.release()
 
-    def get_coordinates(path_to_frames, num_frame):
-        FramesProcess._create_handler()
+    def get_coordinates(self, path_to_frames, num_frame):
+        self._create_handler()
         coordinate = FramesProcess._get_obj_point(path_to_frames, num_frame)
         return coordinate
 
-
-    def _create_handler():
+    def _create_handler(self):
         global crd
         crd = []
         cv2.namedWindow('Choose calibration points')
