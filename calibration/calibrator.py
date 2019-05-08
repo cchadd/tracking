@@ -42,7 +42,7 @@ class FramesGetter(object):
                 print('Created frame {}'.format(count))
                 cv2.imwrite(path_to_store, frame)
 
-class Calibrator(FramesGetter):
+class Calibrator(object):
     def __init__(self, path_to_frames, num_frame):
 
         assert isinstance(path_to_frames, str)
@@ -51,7 +51,7 @@ class Calibrator(FramesGetter):
         self.__frames = path_to_frames
         self.__num_frame = num_frame
         
-    def __draw_on_frames(self, event, coord_x, coord_y, flags, param):
+    def draw_on_frames(self, event, coord_x, coord_y, flags, param):
         '''
         Displays a frame and lets the user draw on it
         '''
@@ -82,10 +82,10 @@ class Calibrator(FramesGetter):
         count = 0
 
         #selecting num_frame in folder
-        frames = os.listdir(self.__path_to_frames)[:self.__num_frame]
+        frames = os.listdir(self.__frames)[:self.__num_frame]
 
         for frame in frames:
-            image = cv2.imread(path + frame)
+            image = cv2.imread(self.__frames + frame)
             im = image.copy()
             while True:
                 cv2.setMouseCallback("image", __draw_on_frames)
