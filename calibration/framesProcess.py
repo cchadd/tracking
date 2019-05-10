@@ -30,8 +30,8 @@ class FramesProcess(object):
         -------
         path_to_store (str):
             path to folder where frames will be stored
-        name (str):
-            name to be given to frames (e.g. name_Number_Of_Frame)
+        name_to_frames (str):
+            name to be given to frames (e.g. name_to_frames_Number_Of_Frame)
         frame_delay (int, float):
             time between each frame
         frame_count (int):
@@ -56,6 +56,27 @@ class FramesProcess(object):
         self._create_handler()
         coordinate = FramesProcess._get_obj_point(path_to_frames, num_frame)
         return coordinate
+
+    def get_a_frame(self, path_to_frames,  num_frame):
+        '''
+        Frame getter
+
+        Inputs:
+        -------
+        path_to_frames (str)
+            Path to frames
+        num_frame (int)
+            Number of the frame to return
+
+        Outputs:
+        --------
+        image (array)
+            The choose image
+        '''
+        
+        image = cv2.imread(path_to_frames + sorted(os.listdir(path_to_frames))[num_frame])
+        return image 
+
 
     def _create_handler(self):
         global crd
