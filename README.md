@@ -1,5 +1,6 @@
 ## <b>Computer Vision - Soccer Analytics</b> [[Project Page]](https://github.com/cchadd/tracking) <br>
-[Clément Chadebec, Thibault Desfontaines]
+
+Clément Chadebec, Thibault Desfontaines
 
 ![Teaser Image](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTThjic_ml5y4jsOK149EIkaqkQT5NfzonORcszj5V_g0hgb8ny)
 
