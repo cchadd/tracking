@@ -33,22 +33,29 @@ Open the following notebook
 
 ### References ###
 
-## Structure ##
+## Code structure ##
 
-<ul>/ PATH</ul>
-     / darknet
-     / roi_frames
-     / video
-     / frames
-     / shared
-          .git
-          / calibration
-          / detection_ballon
-          / detection_personnes
-          / player_stats
-          / interface_graphique
-          / experiments
-          / recherche_articles
-          / AR
-
+<ul>
+  <li>execution path
+  <ul> 
+    <li> darknet </li>
+    <li> roi_frames </li>
+    <li> videos </li>
+    <li> frames </li>
+    <li> shared/tracking 
+      <ul> 
+        <li> .git </li>
+        <li> calibration </li>
+        <li> ball_detection </li>
+        <li> player_detection </li>
+        <li> player_stats </li>
+        <li> gui </li>
+        <li> experiments </li>
+        <li> references </li>
+        <li> AR </li>        
+      </ul>
+    </li>
+  </ul>
+  </li>
+</ul> 
 
