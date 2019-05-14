@@ -17,6 +17,12 @@ This repository contains:
 
 <b>Appendices</b>
  - (A) Related follow-up work
+ 
+### Training videos ###
+From [Urban Soccer](https://www.urbansoccer.fr/videos/)
+<ul>
+    <li>  Aubervilliers, Terrain 10, 03/05/2019, 20h13</li>
+</ul>
 
 ### Dependencies ###
 This code makes use of the Yolo detector available at [pjreddie webpage](https://pjreddie.com/darknet/) as well as OpenCV for calibration and to apply filters on the image.

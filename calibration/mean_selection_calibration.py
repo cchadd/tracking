@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 import cv2
 from calibration.framesProcess import FramesProcess
 
@@ -18,21 +18,21 @@ class MeanSelectionCalib(FramesProcess):
 
         path_to_frames (str)
             Path to the folder in which frames will be stored for further process
-        
+
         real_coordinates (dict)
             Dictionnary with real coordinate {0: (x0, y0),
                                               1, (x1, y1),
                                               ...}
-            By convention: 
+            By convention:
                 - selected points for calibration will have a positive key
                 - selected points for testing calibration will have a negative key
 
         name_to_frame (str)
             Name to be giver to the frames name_to_frames_Number_Of_frame
-        
+
         num_frames (int)
             Number of frames on which perform the calibration
-        
+
         frame_delay (int, float)
             Delay between to recorded frames
         '''
@@ -40,7 +40,7 @@ class MeanSelectionCalib(FramesProcess):
         assert isinstance(real_coordinates, dict)
         assert isinstance(num_frames, int)
         assert isinstance(frame_delay, (int, float))
-        
+
 
         FramesProcess.__init__(self)
         self.__path_to_video = path_to_video
@@ -52,13 +52,13 @@ class MeanSelectionCalib(FramesProcess):
         self.__real_coordinates_dict = real_coordinates
         self.__real_coordinates = []
         self.__testing_coordinates = []
-        
+
         #Calibration properties
         self.__camera_matrix = None
-        self.__distorsion = None 
+        self.__distorsion = None
         self.__rot_matrix = None
         self.__tran_matrix = None
-        
+
     @property
     def camera_matrix(self):
         return self.__camera_matrix
@@ -66,7 +66,7 @@ class MeanSelectionCalib(FramesProcess):
     @property
     def distortion(self):
         return self.__distorsion
-        
+
     def calibrate_camera(self):
         self.get_frames(
                     self.__path_to_video,
@@ -81,7 +81,7 @@ class MeanSelectionCalib(FramesProcess):
 
         sample_frame = self.get_a_frame(
             self.__path_to_frames, 0)
-        
+
         self.__compute_mean_array(image_coordinate)
         self.__get_object_point()
 
@@ -133,17 +133,17 @@ class MeanSelectionCalib(FramesProcess):
                 mean[1] = mean[1]/len(image_coordinate_list)
                 points_mean.append(mean)
             self.__image_coordinates = np.array(list(points_mean))
-        
+
         except IndexError:
             raise IndexError('Number of coord per frame do not match')
 
-    
+
     def __get_object_point(self):
         '''
-        Stored selected coordinates (key >= 0) 
+        Stored selected coordinates (key >= 0)
         order = increasing key's value
         '''
-        
+
         selected_keys = [
             key for key in sorted(
                 self.__real_coordinates_dict.keys()) if key >= 0]
@@ -156,7 +156,7 @@ class MeanSelectionCalib(FramesProcess):
     def __reshaping(self ):
         ''' Reshape image and real coordinates to perform the calibration
 
-        Outputs:
+        Oustputs:
         --------
         reshaped_array (array)
             Reshaped array
@@ -180,4 +180,3 @@ class MeanSelectionCalib(FramesProcess):
         image_p_vec = image_p_vec.reshape(1, -1, 2).astype('float32')
 
         return image_p_vec, real_p_vec
-        
