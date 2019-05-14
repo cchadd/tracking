@@ -132,3 +132,4 @@ class FramesProcess(object):
                     break
         cv2.destroyAllWindows()
         return coord
+
