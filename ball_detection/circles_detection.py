@@ -29,9 +29,19 @@ fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows=False,
 
 cap = cv2.VideoCapture(absolute_path+file_name)
 
-kernel_size = 3
-kernel = np.ones((kernel_size, kernel_size), dtype=np.float32)
-kernel /= (kernel_size * kernel_size)
+x = np.arange(-0.2, 0.2, 0.09)
+y = np.arange(-0.2, 0.2, 0.09)
+xx, yy = np.meshgrid(x, y, sparse=True)
+z = 1/(xx**2 + yy**2)
+z /= np.sum(z)
+h = plt.contourf(x,y,z)
+plt.show()
+
+kernel = z
+
+#kernel_size = 5
+#kernel = np.ones((kernel_size, kernel_size), dtype=np.float32)
+#kernel /= (kernel_size * kernel_size)
 ddepth = -1
 
 count = 0
