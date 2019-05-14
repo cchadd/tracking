@@ -1,29 +1,30 @@
 #%%
 import numpy as np
 import cv2
-from calibration.framesProcess import FramesProcess
-
-path_to_video = '../video/Angle1.mp4'
-path_to_store = '../test_frames/'
-name_to_frames = 'test'
-test = FramesProcess()
-
-test.get_frames(path_to_video, path_to_store, name_to_frames)
-coord = test.get_coordinates(path_to_store, 2)
+from calibration.mean_selection_calibration import MeanSelectionCalib
 
 
 
 
 #%%
 class Calibrator(object):
-    def __init__(self, calibration_method=mean_selection, path_to_frames, num_frame):
-
-        assert isinstance(path_to_frames, str)
-        assert isinstance(num_frame, int)
-
-        self.__frames = path_to_frames
-        self.__num_frame = num_frame
-        self.__calibration_method  = calibration_method
+    def __init__(self, calibration_method, path_to_video, path_to_frames, name_to_frames='', num_frames=5, frame_delay=10):
+        
+        self.calibration_method = calibration_method
+        self.calibrator = MeanSelectionCalib(path_to_video, path_to_frames, name_to_frames, num_frames, frame_delay)
 
 
-    def calibrate_camera
+    def calibration(self):
+        self.calibrator.calibrate_camera()
+        print (self.calibrator.camera_matrix)
+
+
+######TO BE CHECKED#######
+    def compute_projection_err(self):
+        projected_points = cv2.projectPoints(
+           self.calibrator.image_p_vec,
+           self.calibrator.rot_matrix[0],
+           self.calibrator.tran_matrix[0],
+           self.calibrator.camera_matrix,
+           self.calibrator.distortion)
+        error = cv2.norm(projected_points, self.calibrator.real_p_vec)
