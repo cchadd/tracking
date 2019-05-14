@@ -1,5 +1,6 @@
 #%%
 from calibration.mean_selection_calibration import MeanSelectionCalib
+from calibration.calibrator import Calibrator
 
 path_to_video = '../video/Angle1.mp4'
 path_to_store = '../test_frames/'
@@ -28,8 +29,16 @@ soccer_keypoint = {
         -12: (19, 7.5),
         -13: (22, 7.5)
         }
+#%%
 
-
-calib = MeanSelectionCalib(path_to_video, path_to_store, soccer_keypoint, name_to_frames, 3)
+calib = MeanSelectionCalib(path_to_video, path_to_store, soccer_keypoint, name_to_frames, 2)
 calib.calibrate_camera()
 calib.camera_matrix
+
+
+#%%
+cal = Calibrator('mean_selection', path_to_video, path_to_store, soccer_keypoint, name_to_frames,2)
+cal.calibration()
+
+#%%
+cal.compute_projection_err()
