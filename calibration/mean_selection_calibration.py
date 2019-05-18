@@ -1,3 +1,13 @@
+"""
+
+Created on Wed May  6 22:15:06
+Class for camera calibration using mean point selection
+
+@author: cchadd
+
+"""
+
+
 import numpy as np 
 import cv2
 from calibration.framesProcess import FramesProcess
