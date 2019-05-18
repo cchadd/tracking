@@ -21,7 +21,6 @@ soccer_keypoint = {
         0: (0, 0),
         1: (0, 15),
         2: (25, 15),
-        -1: (25, 0),
         # Goal zone border
         3: (0, 4.5),
         4: (0, 10.5),
@@ -74,11 +73,11 @@ calib.camera_matrix
 cal = Calibrator('mean_selection', path_to_video, path_to_store, soccer_keypoint, name_to_frames,2)
 cal.calibration()
 
-test_points = np.array([[ 36.5,  72.5, 1],
-                        [192.5,  44.5, 1],
-                        [592. , 123. , 1],
-                        [ 88. ,  60. , 1],
-                        [ 146.5,  49., 1]], dtype=np.float32)
+test_points = np.array([[ 36.5, 72.5, 1.],
+                        [192.5, 44.5, 1.],
+                        [ 592., 123., 1.],
+                        [  88.,  60., 1.],
+                        [146.5,  49., 1.]], dtype=np.float32)
 
 projected_points, _ = cal.project_points(test_points)
 
