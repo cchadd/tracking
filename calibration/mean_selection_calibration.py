@@ -62,11 +62,14 @@ class MeanSelectionCalib(FramesProcess):
         self.__image_coordinates = None
         self.__real_coordinates_dict = real_coordinates
         self.__real_coordinates = []
-        self.__testing_coordinates = []
+        self.__real_testing_coordinates = []
+        self.__image_testing_coordinates = None
 
         #Vector points
         self.__image_p_vec = None
         self.__real_p_vec = None
+        self.__image_testing_p_vec = None
+        self.__real_testing_p_vec = None
         
         #Calibration properties
         self.__camera_matrix = None
@@ -83,6 +86,13 @@ class MeanSelectionCalib(FramesProcess):
         return self.__real_p_vec
 
     @property
+    def image_testing_p_vec(self):
+        return self.__testing_p_vec
+
+    def real_testing_p_vec(self):
+        return self.__real_testing_p_vec
+
+    @property
     def rot_matrix(self):
         return self.__rot_matrix
 
@@ -97,6 +107,7 @@ class MeanSelectionCalib(FramesProcess):
     @property
     def distortion(self):
         return self.__distorsion
+
         
     def calibrate_camera(self):
         self.get_frames(
@@ -108,13 +119,15 @@ class MeanSelectionCalib(FramesProcess):
 
         image_coordinate = self.get_coordinates(
                                             self.__path_to_frames,
-                                            self.__num_frames)
+                                            self.__num_frames,
+                                            'Choose calibration points')
 
         sample_frame = self.get_a_frame(
             self.__path_to_frames, 0)
         
-        self.__compute_mean_array(image_coordinate)
+        self.__image_coordinates = self.__compute_mean_array(image_coordinate)
         self.__get_object_point()
+        
 
         try:
             assert self.__image_coordinates.shape == self.__real_coordinates.shape
@@ -122,7 +135,10 @@ class MeanSelectionCalib(FramesProcess):
         except:
             print('Dimension of image and object points do not match')
 
-        self.__reshaping()
+        self.__image_p_vec, self.__real_p_vec = self.__reshaping(
+                                                            self.__image_coordinates,
+                                                            self.__real_coordinates,
+                                                            'calibration')
 
         camera_matrix = cv2.initCameraMatrix2D(
             [self.real_p_vec],
@@ -142,6 +158,19 @@ class MeanSelectionCalib(FramesProcess):
         self.__rot_matrix = rvecs
         self.__tran_matrix = tvecs
 
+
+    def record_testing_points(self):
+
+        testing_coordinate = self.get_coordinates(
+                                            self.__path_to_frames,
+                                            1,
+                                            'Choose testing points')
+        self.__image_testing_coordinates = self.__compute_mean_array(testing_coordinate)
+        self.__get_object_testing_points()
+        self.__image_testing_p_vec, self.__real_testing_p_vec = self.__reshaping(
+                                                                        self.__image_testing_coordinates,
+                                                                        self.__real_testing_coordinates,
+                                                                        'test')
 
 
     def __compute_mean_array(self, image_coordinate_list):
@@ -163,7 +192,8 @@ class MeanSelectionCalib(FramesProcess):
                 mean[0] = mean[0]/len(image_coordinate_list)
                 mean[1] = mean[1]/len(image_coordinate_list)
                 points_mean.append(mean)
-            self.__image_coordinates = np.array(list(points_mean))
+            return np.array(list(points_mean))
+
         
         except IndexError:
             raise IndexError('Number of coord per frame do not match')
@@ -181,10 +211,27 @@ class MeanSelectionCalib(FramesProcess):
         for key in selected_keys:
             self.__real_coordinates.append(list(
                 self.__real_coordinates_dict[key]))
-        self.__real_coordinates = np.array(
+        self.__real_coordinates= np.array(
             self.__real_coordinates)
 
-    def __reshaping(self):
+
+    def __get_object_testing_points(self):
+        '''
+        Stored selected coordinates (key < 0) 
+        order = increasing key's value
+        '''
+        
+        selected_keys = [
+            key for key in sorted(
+                self.__real_coordinates_dict.keys()) if key < 0]
+        for key in selected_keys:
+            self.__real_testing_coordinates.append(list(
+                self.__real_coordinates_dict[key]))
+        self.__real_testing_coordinates = np.array(
+            self.__real_testing_coordinates)
+
+
+    def __reshaping(self, image_coordinates, object_coordinates, calib_test):
         ''' Reshape image and real coordinates to perform the calibration
 
         Outputs:
@@ -193,12 +240,18 @@ class MeanSelectionCalib(FramesProcess):
             Reshaped array
         '''
 
-        image_p_vec = self.__image_coordinates.copy()
-        real_p_vec = self.__real_coordinates.copy()
+        image_p_vec = image_coordinates.copy()
+        real_p_vec = object_coordinates.copy()
 
-        selected_keys = [
-            key for key in sorted(
-                self.__real_coordinates_dict.keys()) if key >= 0]
+        if calib_test == 'calibration':
+            selected_keys = [
+                key for key in sorted(
+                    self.__real_coordinates_dict.keys()) if key >= 0]
+
+        if calib_test == 'test':
+            selected_keys = [
+                key for key in sorted(
+                    self.__real_coordinates_dict.keys())]
 
         image_p_vec = image_p_vec[selected_keys]
 
@@ -210,5 +263,16 @@ class MeanSelectionCalib(FramesProcess):
         print (image_p_vec, real_p_vec)
         image_p_vec = image_p_vec.reshape(1, -1, 2).astype('float32')
 
-        self.__image_p_vec = image_p_vec
-        self.__real_p_vec = real_p_vec    
+        return image_p_vec, real_p_vec
+
+    def __reshaping_testing(self):
+
+        testing_p_vec = self.__real_testing_coordinates.copy()
+        selected_keys = [
+            key for key in sorted(
+                self.__real_coordinates_dict.keys())]
+
+        testing_p_vec = testing_p_vec[selected_keys]
+        testing_p_vec = testing_p_vec.reshape(1, -1, 2).astype('float32')
+
+        self.__testing_p_vec = testing_p_vec

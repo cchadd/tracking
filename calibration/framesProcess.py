@@ -57,9 +57,9 @@ class FramesProcess(object):
 
         capture.release()
 
-    def get_coordinates(self, path_to_frames, num_frame):
-        self._create_handler()
-        coordinate = FramesProcess._get_obj_point(path_to_frames, num_frame)
+    def get_coordinates(self, path_to_frames, num_frame, window_name):
+        self._create_handler(window_name)
+        coordinate = FramesProcess._get_obj_point(path_to_frames, num_frame, window_name)
         return coordinate
 
     def get_a_frame(self, path_to_frames,  num_frame):
@@ -83,10 +83,10 @@ class FramesProcess(object):
         return image 
 
 
-    def _create_handler(self):
+    def _create_handler(self, window_name):
         global crd
         crd = []
-        cv2.namedWindow('Choose calibration points')
+        cv2.namedWindow(window_name)
 
     def _draw_on_frames(event, x, y, flags, param):
         '''
@@ -102,9 +102,9 @@ class FramesProcess(object):
             refPt.append((x, y))
             cropping = False
             cv2.rectangle(im, refPt[0], refPt[1], (0, 0, 255), 2)
-            cv2.imshow("Choose calibration points", im)
+            #cv2.imshow("Choose calibration points", im)
 
-    def _get_obj_point(path_to_frames, num_frame):
+    def _get_obj_point(path_to_frames, num_frame, window_name):
         '''
         Returns coordinates of selected points
         Inputs:
@@ -126,10 +126,9 @@ class FramesProcess(object):
             image = cv2.imread(path_to_frames + frame)
             im = image.copy()
             while True:
-                cv2.setMouseCallback("Choose calibration points", FramesProcess._draw_on_frames)
-                cv2.imshow("Choose calibration points", im)
+                cv2.setMouseCallback(window_name, FramesProcess._draw_on_frames)
+                cv2.imshow(window_name, im)
                 key = cv2.waitKey(1) & 0xFF
-                cv2.imwrite('calibrated.jpg', im)
                 if key == ord('c'):
                     count += 1
                     coord.append(crd)
