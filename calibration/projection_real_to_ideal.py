@@ -254,38 +254,5 @@ plt.show()
 
 # We now have the camera matrix
 
-#%%
-
-image_p_vec = image_points.copy()
-n = image_p_vec.shape[0]
-v = np.ones ((n, 1))
-image_p_vec = np.hstack((image_p_vec, v))
-image_p_vec = image_p_vec.reshape(1, -1, 3).astype('float32')
-
-i = 0 # Since there is only one temporal frame
-projected_points, _ = cv2.projectPoints(image_p_vec[i], rvecs[i], tvecs[i],
-                                        mtx, dist)
-
-fig = plt.figure(figsize=(10, 10))
-
-plt.scatter(projected_points[:, 0, 0], projected_points[:, 0, 1],
-            edgecolor='k', alpha=0.8, color='r')
-
-plt.scatter(object_p_vec[0, :, 0], object_p_vec[0, :, 1],
-            edgecolor='k', alpha=0.8, color='gray')
-
-for i, key in enumerate(key_selection):
-    a = tuple(projected_points[i][0])
-    b = tuple(object_p_vec[0][i])
-    plt.annotate(str(key), a)
-    plt.annotate(str(key), b)
-    stacked = np.vstack((a, b))
-    plt.plot(stacked[:, 0], stacked[:, 1], 'k--')
-
-plt.show()
-
-
-error = cv2.norm(projected_points[:, i], object_p_vec[i], cv2.NORM_L2)/len(projected_points)
-print('Reprojection error: {}'.format(round(error, 2)))
-
+#%% Let's consider an simple move from a player
 
