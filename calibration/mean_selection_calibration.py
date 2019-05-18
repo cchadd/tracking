@@ -87,8 +87,9 @@ class MeanSelectionCalib(FramesProcess):
 
     @property
     def image_testing_p_vec(self):
-        return self.__testing_p_vec
+        return self.__image_testing_p_vec
 
+    @property
     def real_testing_p_vec(self):
         return self.__real_testing_p_vec
 
@@ -217,13 +218,13 @@ class MeanSelectionCalib(FramesProcess):
 
     def __get_object_testing_points(self):
         '''
-        Stored selected coordinates (key < 0) 
+        Stored testing coordinates (all of seeable points) 
         order = increasing key's value
         '''
         
         selected_keys = [
             key for key in sorted(
-                self.__real_coordinates_dict.keys()) if key < 0]
+                self.__real_coordinates_dict.keys())]
         for key in selected_keys:
             self.__real_testing_coordinates.append(list(
                 self.__real_coordinates_dict[key]))
@@ -241,19 +242,22 @@ class MeanSelectionCalib(FramesProcess):
         '''
 
         image_p_vec = image_coordinates.copy()
+        print ('image_p_vec {}'.format(image_p_vec))
         real_p_vec = object_coordinates.copy()
 
-        if calib_test == 'calibration':
-            selected_keys = [
-                key for key in sorted(
-                    self.__real_coordinates_dict.keys()) if key >= 0]
-
-        if calib_test == 'test':
-            selected_keys = [
-                key for key in sorted(
-                    self.__real_coordinates_dict.keys())]
-
-        image_p_vec = image_p_vec[selected_keys]
+        #if calib_test == 'calibration':
+        #    selected_keys = [
+        #        key for key in sorted(
+        #            self.__real_coordinates_dict.keys()) if key >= 0]
+#
+        #    image_p_vec = image_p_vec[selected_keys]
+#
+        #if calib_test == 'test':
+        #    selected_keys = [
+        #        key for key in sorted(
+        #            self.__real_coordinates_dict.keys())]
+#
+        
 
         n = real_p_vec.shape[0]
         v = np.ones((n, 1))
@@ -265,14 +269,4 @@ class MeanSelectionCalib(FramesProcess):
 
         return image_p_vec, real_p_vec
 
-    def __reshaping_testing(self):
-
-        testing_p_vec = self.__real_testing_coordinates.copy()
-        selected_keys = [
-            key for key in sorted(
-                self.__real_coordinates_dict.keys())]
-
-        testing_p_vec = testing_p_vec[selected_keys]
-        testing_p_vec = testing_p_vec.reshape(1, -1, 2).astype('float32')
-
-        self.__testing_p_vec = testing_p_vec
+    
