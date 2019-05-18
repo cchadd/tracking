@@ -1,5 +1,10 @@
 """
-Camera Calibration Class
+
+Created on Wed May  6 22:15:06
+Abstract class for frames process
+
+@author: cchadd
+
 """
 
 import cv2
