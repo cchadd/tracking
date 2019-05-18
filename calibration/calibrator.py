@@ -1,4 +1,11 @@
 #%%
+"""
+Created on Wed May  6 22:15:06
+Main class for camera calibration
+
+@author: cchadd
+"""
+
 import numpy as np
 import cv2
 from calibration.mean_selection_calibration import MeanSelectionCalib
