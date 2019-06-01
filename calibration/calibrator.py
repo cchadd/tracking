@@ -44,5 +44,5 @@ class Calibrator(object):
            self.calibrator.tran_matrix[0],
            self.calibrator.camera_matrix,
            self.calibrator.distortion)
-
+        
         return projected_points

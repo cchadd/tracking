@@ -72,12 +72,10 @@ calib.camera_matrix
 
 cal = Calibrator('mean_selection', path_to_video, path_to_store, soccer_keypoint, name_to_frames,2)
 cal.calibration()
-
-test_points = np.array([[ 36.5,  72.5, 1],
-                        [192.5,  44.5, 1],
-                        [592. , 123. , 1],
-                        [ 88. ,  60. , 1],
-                        [ 146.5,  49., 1]], dtype=np.float32)
+#%%
+test_points = np.array([[ 36.5,  72.5],
+                        [192.5,  44.5],
+                        [592. , 123.]], dtype=np.float32)
 
 #%%
 testing = cal.calibrator.real_testing_p_vec.copy()
@@ -95,3 +93,43 @@ fig = plt.figure(figsize=(10, 10))
 im = cv2.imread('../test_frames/test_1.jpg')
 plt.scatter(projected_points[: , :, 0][:, 0], projected_points[:, : , 1][:, 0], s=10, color='r', alpha=0.8)
 plt.imshow(im)
+
+proj = projected_points
+
+#%%
+project = []
+for element in proj:
+    project.append(list(element[0]))
+
+project = np.array(project)
+#%%
+
+
+n = project.shape[0]
+v = np.ones((n,1))
+
+project = np.hstack((project, v))
+#%%
+cv2.getAffineTransform(project[:3], cal.calibrator.real_p_vec[:, :3, :2][0])
+#%%
+mat = cv2.Rodrigues(cal.calibrator.rot_matrix[0])
+invers = cv2.invert(mat[0])
+cv2.getAffineTransform(proj, cal.calibrator.real_p_vec)
+#%%
+
+cam = cal.calibrator.camera_matrix
+rot = cv2.Rodrigues(cal.calibrator.rot_matrix[0])
+tran = cal.calibrator.tran_matrix[0]
+point = cal.calibrator.real_p_vec[0][0]
+
+inve = cv2.invert(cal.calibrator.camera_matrix)
+calib = cam.dot(rot[0]).dot(point) + tran[0]
+
+#%%
+undi = cv2.undistort(im, cal.calibrator.camera_matrix, cal.calibrator.distortion)
+plt.imshow(undi)
+plt.savefig('./undistort_flux_1.jpg')
+#%%
+plt.imshow(im)
+
+#%%
