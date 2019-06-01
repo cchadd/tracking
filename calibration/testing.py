@@ -128,7 +128,7 @@ calib = cam.dot(rot[0]).dot(point) + tran[0]
 #%%
 undi = cv2.undistort(im, cal.calibrator.camera_matrix, cal.calibrator.distortion)
 plt.imshow(undi)
-plt.savefig('./undistort_flux_1.jpg')
+plt.savefig('./undistort_flux_1.png')
 #%%
 plt.imshow(im)
 
