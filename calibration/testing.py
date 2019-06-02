@@ -7,11 +7,12 @@
 #%% Imports
 from calibration.mean_selection_calibration import MeanSelectionCalib
 from calibration.calibrator import Calibrator
+from calibration.framesProcess import FramesProcess
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 #%%
-path_to_video = '../video/Angle1.mp4'
+path_to_video = '../video/test.webm'
 path_to_store = '../test_frames/'
 name_to_frames = 'test'
 
@@ -19,24 +20,24 @@ name_to_frames = 'test'
 soccer_keypoint = {
         # Corners
         0: (0, 0),
-        1: (0, 15),
-        2: (25, 15),
+        1: (0, 10),
+        2: (10, 0),
         # Goal zone border
-        3: (0, 4.5),
-        4: (0, 10.5),
-        5: (25, 10.5),
-        6: (25, 4.5),
+        3: (10, 10),
+        -4: (5, 5),
+        -5: (5, 0),
+        -6: (0, 5),
         # Goal cage
-        -7:  (0, 6),
-        -8: (0, 9),
-        -2: (25, 9),
-        -3: (25, 6),
+        -7:  (0, 2.5),
+        -8: (0, 7.5),
+        -2: (5, 2.5),
+        -3: (7.5, 7.5),
         #
-        -9: (3, 7.5),
-        -10: (6, 7.5),
-        -11: (12.5, 7.5),
-        12: (19, 7.5),
-        13: (22, 7.5)
+        -9: (0, 0),
+        -10: (0, 0),
+        -11: (0, 0),
+        -12: (0, 0),
+        -13: (0, 0)
         }
 
 #%% Display keypoints
@@ -70,7 +71,7 @@ calib.camera_matrix
 
 #%% To be used
 
-cal = Calibrator('mean_selection', path_to_video, path_to_store, soccer_keypoint, name_to_frames,2)
+cal = Calibrator('mean_selection', path_to_video, path_to_store, soccer_keypoint, name_to_frames,1)
 cal.calibration()
 #%%
 test_points = np.array([[ 36.5,  72.5],
@@ -111,25 +112,94 @@ v = np.ones((n,1))
 project = np.hstack((project, v))
 #%%
 cv2.getAffineTransform(project[:3], cal.calibrator.real_p_vec[:, :3, :2][0])
-#%%
-mat = cv2.Rodrigues(cal.calibrator.rot_matrix[0])
-invers = cv2.invert(mat[0])
-cv2.getAffineTransform(proj, cal.calibrator.real_p_vec)
+
+
 #%%
 
 cam = cal.calibrator.camera_matrix
 rot = cv2.Rodrigues(cal.calibrator.rot_matrix[0])
 tran = cal.calibrator.tran_matrix[0]
-point = cal.calibrator.real_p_vec[0][0]
+point = np.array([0, 0, 0])
 
-inve = cv2.invert(cal.calibrator.camera_matrix)
-calib = cam.dot(rot[0]).dot(point) + tran[0]
+mtx_inve = cv2.invert(cal.calibrator.camera_matrix)
+rot_inv = cv2.invert(rot[0])
+image = np.array([[5.],
+                  [94.],
+                  [0.]], dtype='float32')
+
+rvec_inv = cv2.Rodrigues(rot_inv[1])
+#cv2.projectPoints(image, rvec_inv[0], -tran, mtx_inve[1], None)
+(rot_inv[1].dot(mtx_inve[1])).dot(image) - tran
+
+projected_points, _ = cv2.projectPoints(
+           cal.calibrator.real_testing_p_vec,
+           cal.calibrator.rot_matrix[0],
+           cal.calibrator.tran_matrix[0],
+           cal.calibrator.camera_matrix,
+           cal.calibrator.distortion)
+         
+
+fig = plt.figure(figsize=(10, 10))
+
+im = cv2.imread('../test_frames/test_1.jpg')
+plt.scatter(projected_points[: , :, 0][:, 0], projected_points[:, : , 1][:, 0], s=10, color='r', alpha=0.8)
+plt.imshow(im)
+
+proj = projected_points
 
 #%%
-undi = cv2.undistort(im, cal.calibrator.camera_matrix, cal.calibrator.distortion)
+img = cv2.imread('../test_frames/test_2.jpg')
+h,  w = img.shape[:2]
+newcameramtx, roi=cv2.getOptimalNewCameraMatrix(cal.calibrator.camera_matrix,cal.calibrator.distortion,(w,h),1,(w,h))
+
+undi = cv2.undistort(img, cal.calibrator.camera_matrix, cal.calibrator.distortion, None, newcameramtx)
+plt.imshow(undi)
+#%%
+# undistort
+mapx,mapy = cv2.initUndistortRectifyMap(cal.calibrator.camera_matrix,cal.calibrator.distortion,None,newcameramtx,(w,h),5)
+dst = cv2.remap(img,mapx,mapy,cv2.INTER_LINEAR)
+
+# crop the image
+x,y,w,h = roi
+dst = dst[y:y+h, x:x+w]
+cv2.imwrite('calibresult.png',dst)
+plt.imshow(dst)
+
+#%%
+undi = cv2.undistort(im, cal.calibrator.camera_matrix, cal.calibrator.distortion, None, None)
 plt.imshow(undi)
 plt.savefig('./undistort_flux_1.png')
 #%%
 plt.imshow(im)
+
+#%%
+p = FramesProcess()
+
+coord = p.get_coordinates(path_to_store, 1, 'ok')
+
+
+#%%
+coord
+
+#%%
+plt.imshow(im)
+
+#%%
+
+h,  w = im.shape[:2]
+newcameramtx, roi=cv2.getOptimalNewCameraMatrix(cal.calibrator.camera_matrix,cal.calibrator.distortion,(w,h),1,(w,h))
+
+
+
+#%%
+# undistort
+dst = cv2.undistort(im, cal.calibrator.camera_matrix, cal.calibrator.distortion, None, newcameramtx)
+
+# crop the image
+x,y,w,h = roi
+#dst = dst[y:y+h, x:x+w]
+plt.imshow(dst)
+cv2.imwrite('calibresult.png',dst)
+
 
 #%%
