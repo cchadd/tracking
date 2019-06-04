@@ -2,8 +2,43 @@ import numpy as np
 import pandas as pd
 
 class Player(object):
+    """
+    Player class to perform individual stats and performance
+    analysis
+    """
+
 
     def __init__(self, name, surname, number, role, team):
+        """
+        Player constructor
+
+        Inputs:
+        -------
+        
+        name (str)
+            Player's name
+
+        surname (str)
+            Player's surname 
+
+        number (int)
+            Player's number
+
+        role (str)
+            Player's role on the field
+
+        team (str)
+            Name of the player's team
+
+        Attributes:
+        -----------
+        stats (DataFrame)
+            A DataFrame containing all the computed stats
+                columns = ['position', 'speed', 'acceleration',  ...]
+                index = (timestamps)
+
+         
+        """
         assert isinstance(name, str)
         assert isinstance(surname, str)
         assert isinstance(number, int)
