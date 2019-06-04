@@ -12,18 +12,17 @@ team_A:
       number: 1
       role: referee
   color: blue
-
-#team_B:
-#  team_name: team B
-#    composition:
-#      player_1:
-#        name: Chadebec
-#        surname: Clement
-#        number: 8
-#        role: goal keeper
-#      player_2:
-#        name: Desfontaines
-#        surname: Titi
-#        number: 1
-#        role: referee
-#    color: blue
+team_B:
+  team_name: team A
+  composition:
+    player_1:
+      name: Chadebec
+      surname: Clement
+      number: 8
+      role: goal keeper
+    player_2:
+      name: Desfontaines
+      surname: Titi
+      number: 1
+      role: referee
+  color: blue
