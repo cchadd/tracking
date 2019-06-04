@@ -35,6 +35,13 @@ To start calibration, run 'python hello.py'.
 ### (1) Evaluate the result on a Notebook ###
 Open the following notebook 
 
+### (2) Choose a ROI on a video ###
+
+### Draw a perspective grid on the field ###
+https://web.archive.org/web/20160418004152/http://freespace.virgin.net/hugo.elias/graphics/x_persp.htm
+
+
+
 ## Related follow-up work ##
 
 ### References ###
