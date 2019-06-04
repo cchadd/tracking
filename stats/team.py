@@ -25,9 +25,11 @@ class Game(object):
             params = yaml.load(ffile)
 
         team_1 = params['team_A']
+        team_2 = params['team_B']
         
 
         self.team = Team(**team_1)
+        self.adv = Team(**team_2)
 
 #%%
 game = Game('./stats/config/sample_game_config.yaml')
