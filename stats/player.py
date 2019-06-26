@@ -51,10 +51,30 @@ class Player(object):
         self.team = team
         self.__stats = pd.DataFrame(columns=['position', 'speed', 'acceleration', 'has_ball'])
 
+    def update(self, obs):
+        """
+        Update player stats form observables got from camera
+
+        obs = {
+            'position': (x, y),
+            ...}
+        """
+
+
+    def main(self):
+        """
+        Main function.
+        Will be called periodically got refresh players stats.
+        """
+        self.__compute_speed()
+        
+
+
     def __compute_speed(self, smoothing_factor=1):
         
         dt = self.__stats.index
         self.__stats['speed'] = self.__stats['position'].diff() / dt
+
 
 #%%
 import numpy as np

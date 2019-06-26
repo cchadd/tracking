@@ -40,8 +40,9 @@ class Team(object):
             player_param = composition[player]
             self.composition[player] = Player(team=team_name, **player_param)
 
-                
-
+    def update(self, obs):
+        for (name, player) in self.composition.items():
+            player.update(obs[name])
 
 class Game(object):
 
@@ -55,6 +56,30 @@ class Game(object):
 
         self.team = Team(**team_1)
         self.adv = Team(**team_2)
+
+
+    def update(self, obs):
+        """
+        Update function to refresg game stats
+
+        Inputs:
+        -------
+
+        obs (dict)
+            Dictionnary with player postions and all observables recorded via the camera
+            obs = {
+                'player_1': {
+                    'position': (x, y),
+                    ...},
+                'player_2: {
+                    'position': (x, y),
+                    ...},
+                ...}
+        """
+
+        self.team.update(obs)
+        self.adv.update(obs)
+
 
 #%%
 game = Game('./stats/config/sample_game_config.yaml')
