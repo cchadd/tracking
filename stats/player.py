@@ -1,5 +1,7 @@
+#%%
 import numpy as np
 import pandas as pd
+from collections import deque
 
 class Player(object):
     """
@@ -8,7 +10,7 @@ class Player(object):
     """
 
 
-    def __init__(self, name, surname, number, role, team):
+    def __init__(self, name, surname, number, role, team, maxlen=5):
         """
         Player constructor
 
@@ -37,6 +39,13 @@ class Player(object):
                 columns = ['position', 'speed', 'acceleration',  ...]
                 index = (timestamps)
 
+        last_positions (deque):
+            'max_len' last recorded postions to compute instant speed and
+            acceleration
+
+        last_times (deque)
+            'maxlen' last recorded times to compute instant speed and 
+            acceleration. Times will be datetime like values
          
         """
         assert isinstance(name, str)
@@ -50,8 +59,12 @@ class Player(object):
         self.role = role
         self.team = team
         self.__stats = pd.DataFrame(columns=['position', 'speed', 'acceleration', 'has_ball'])
+        self.__last_positions = deque([], maxlen=maxlen)
+        self.__last_times = deque([], maxlen=maxlen)
+        self.__instant_speed = 0
+        self.__instant_acc = 0
 
-    def update(self, obs):
+    def update(self, obs, time):
         """
         Update player stats form observables got from camera
 
@@ -59,7 +72,8 @@ class Player(object):
             'position': (x, y),
             ...}
         """
-
+        self.__last_positions.append(obs['position'])
+        self.__last_times.append(time)
 
     def main(self):
         """
@@ -70,10 +84,10 @@ class Player(object):
         
 
 
-    def __compute_speed(self, smoothing_factor=1):
+    def compute_speed(self, window=5, smoothing_factor=1):
         
         dt = self.__stats.index
-        self.__stats['speed'] = self.__stats['position'].diff() / dt
+        self.__stats['speed'][-1:] = sum(df['position'][-window:])
 
 
 #%%
@@ -81,6 +95,8 @@ import numpy as np
 import pandas as pd
 df = pd.DataFrame(columns=['position', 'speed', 'acceleration'])
 
-
+for i in range()
+df['position'] = [i + 1 for i in range(0,1)]
+df['speed'][-1:] = sum(df['position'][-5:])
 
 #%%
