@@ -91,12 +91,5 @@ class Player(object):
 
 
 #%%
-import numpy as np
-import pandas as pd
-df = pd.DataFrame(columns=['position', 'speed', 'acceleration'])
-
-for i in range()
-df['position'] = [i + 1 for i in range(0,1)]
-df['speed'][-1:] = sum(df['position'][-5:])
 
 #%%
